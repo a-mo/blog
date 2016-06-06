@@ -10,6 +10,10 @@
 
     <!--Description-->
     
+        <meta name="description" content="今天在码代码时遇到一个问题。环境是在Spring+SringMVC+Mybatis。在一个Service中通过注解注入另一个Service时，报了以下错误：  
+
+No unique bean of type [xxx] expected single matching bean but found">
+    
 
     <!--Author-->
     
@@ -17,6 +21,8 @@
     
 
     <!--Open Graph Title-->
+    
+        <meta property="og:title" content="一个Spring注入的问题"/>
     
 
     <!--Open Graph Site Name-->
@@ -29,7 +35,7 @@
 
     <!-- Title -->
     
-    <title>Hi.</title>
+    <title>一个Spring注入的问题 - Hi.</title>
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
@@ -96,126 +102,71 @@
 
     <!-- Main Content -->
     <!-- Page Header -->
-<!-- Set your background image for this header in the theme's configuration: index_cover -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
 <header class="intro-header" style="background-image: url('http://7xi579.com1.z0.glb.clouddn.com/blogmyblog.jpeg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="site-heading">
-                    <h1>Hi.</h1>
-                    <hr class="small">
-                    <span class="subheading"></span>
+                <div class="post-heading">
+                    <h1>一个Spring注入的问题</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        2016-06-06
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            
-                <div class="post-preview">
-    <a href="/2016/06/06/一个Spring注入的问题/">
-        <h2 class="post-title">
-            一个Spring注入的问题
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-06-06
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2016/04/20/如何阅读一本书/">
-        <h2 class="post-title">
-            如何阅读一本书
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-04-20
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2016/04/06/计划目录/">
-        <h2 class="post-title">
-            计划目录
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-04-06
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2016/03/28/学习路线/">
-        <h2 class="post-title">
-            最近要做的
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-03-28
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2016/03/22/1随便说说/">
-        <h2 class="post-title">
-            随便说说
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-03-22
-    </p>
-</div>
-<hr>
-            
-                <div class="post-preview">
-    <a href="/2016/03/01/hello-world/">
-        <h2 class="post-title">
-            Hello World
-        </h2>
-        
-    </a>
-    <p class="post-meta">
-        <!-- Date and Author -->
-        
-        2016-03-01
-    </p>
-</div>
-<hr>
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/spring/">#spring</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                </div>
             
 
-            <ul class="pager">
-    
-    
-</ul>
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>今天在码代码时遇到一个问题。<br>环境是在Spring+SringMVC+Mybatis。<br>在一个Service中通过注解注入另一个Service时，报了以下错误：  </p>
+<blockquote>
+<p>No unique bean of type [xxx] expected single matching bean but found 2  </p>
+</blockquote>
+<p>根据异常信息来看的话，是说通过Autowired注入对象失败，原因是本该找到一个类，结果却找到了两个类。究其原因的话是因为我要注入的这个类和另一个类都继承自同一个父类，而注释@Autowired是根据类型匹配，相应的解决办法应该是改用@Resource来注解，这个注解是按照名称来匹配类，同时在要注入的类上添加名称标识，如下：<br>    //Service类1<br>    public class Demo{<br>        @Resource(name=”injection”)<br>        private Injection injection;<br>    }<br>    //Service类2<br>    @Service(value=”injection”)<br>    public class Demo{<br>    }</p>
+<p>这样修改应该是需要把Autowired都改为Resource，继承自同一个父类的这两个类都该添加名称标识，奈何现在其中一个类已被封装，父类也被封装，不方便修改，只能重写了一个父类，使两个类不再出于同一父类。<br>PS：其实这个问题值得好好研究下Spring相应的文档和源码，我的另一个Person类也有类似的情况，也是与另一个类同样继承自一个父类，却不需要修改Autowired，值得深入探究下这个问题。</p>
+
+            </div>
+
+            <!-- Comments -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+
+
+            </div>
         </div>
     </div>
-</div>
-
-
+</article>
 
     <!-- Footer -->
     <hr />
